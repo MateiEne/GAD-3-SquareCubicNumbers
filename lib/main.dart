@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'dart:math';
 
 void main() {
   runApp(const SquareCubicNumbers());
@@ -27,6 +28,7 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController controller = TextEditingController();
 
   String? errorText;
+  String dialogText = '';
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +60,9 @@ class _HomePageState extends State<HomePage> {
                 errorText: errorText,
               ),
               onSubmitted: (String? value) {
-                gameLogic();
+                setState(() {
+                  gameLogic();
+                });
               },
             )
           ],
@@ -66,7 +70,9 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          gameLogic();
+          setState(() {
+            gameLogic();
+          });
         },
         child: const Icon(Icons.check),
       ),
@@ -82,6 +88,70 @@ class _HomePageState extends State<HomePage> {
       errorText = 'Please enter a number';
       return;
     }
-    print('${controller.text}');
+
+    int? valueReceived;
+    valueReceived = int.tryParse(controller.text);
+
+    if (valueReceived == null) {
+      errorText = 'this is not a valid number';
+      return;
+    }
+
+    if (isSquareNumber(valueReceived)) {
+      if (isCubicNumber(valueReceived)) {
+        dialogText = 'is both SQUARE and CUBIC';
+      } else {
+        dialogText = 'is SQUARE';
+      }
+    } else if (isCubicNumber(valueReceived)) {
+      dialogText = 'is CUBIC';
+    } else {
+      dialogText = 'is neither SQUARE or CUBIC';
+    }
+
+    errorText = null;
+    showPopUp(valueReceived);
+  }
+
+  void showPopUp(int? value) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('$value'),
+          content: Text(
+            'Number $value $dialogText',
+          ),
+        );
+      },
+    );
+  }
+
+  bool isCubicNumber(int value) {
+    if (value == 1 || value == 0) {
+      return true;
+    }
+
+    for (int i = 2; i < value / 2; i++) {
+      if (i * i * i == value) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  bool isSquareNumber(int value) {
+    if (value == 1 || value == 0) {
+      return true;
+    }
+
+    for (int i = 2; i < value / 2; i++) {
+      if (i * i == value) {
+        return true;
+      }
+    }
+
+    return false;
   }
 }
