@@ -28,7 +28,6 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController controller = TextEditingController();
 
   String? errorText;
-  String dialogText = '';
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +60,7 @@ class _HomePageState extends State<HomePage> {
               ),
               onSubmitted: (String? value) {
                 setState(() {
-                  gameLogic();
+                  checkNumber();
                 });
               },
             )
@@ -71,16 +70,12 @@ class _HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () {
           setState(() {
-            gameLogic();
+            checkNumber();
           });
         },
         child: const Icon(Icons.check),
       ),
     );
-  }
-
-  void gameLogic() {
-    checkNumber();
   }
 
   void checkNumber() {
@@ -97,30 +92,33 @@ class _HomePageState extends State<HomePage> {
       return;
     }
 
+    String dialogText;
+
     if (isSquareNumber(valueReceived)) {
       if (isCubicNumber(valueReceived)) {
-        dialogText = 'is both SQUARE and CUBIC';
+        dialogText = 'Number $valueReceived is both SQUARE and CUBIC';
       } else {
-        dialogText = 'is SQUARE';
+        dialogText = 'Number $valueReceived is SQUARE';
       }
     } else if (isCubicNumber(valueReceived)) {
-      dialogText = 'is CUBIC';
+      dialogText = 'Number $valueReceived is CUBIC';
     } else {
-      dialogText = 'is neither SQUARE or CUBIC';
+      dialogText = 'Number $valueReceived is neither SQUARE or CUBIC';
     }
 
     errorText = null;
-    showPopUp(valueReceived);
+    showPopUp(valueReceived, dialogText);
+    controller.clear();
   }
 
-  void showPopUp(int? value) {
+  void showPopUp(int? value, String text) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('$value'),
           content: Text(
-            'Number $value $dialogText',
+            text,
           ),
         );
       },
@@ -132,8 +130,10 @@ class _HomePageState extends State<HomePage> {
       return true;
     }
 
-    for (int i = 2; i < value / 2; i++) {
-      if (i * i * i == value) {
+    int tripleI;
+
+    for (int i = 2; (tripleI = i * i * i) <= value; i++) {
+      if (tripleI == value) {
         return true;
       }
     }
@@ -146,8 +146,9 @@ class _HomePageState extends State<HomePage> {
       return true;
     }
 
-    for (int i = 2; i < value / 2; i++) {
-      if (i * i == value) {
+    int doubleI;
+    for (int i = 2; (doubleI = i * i) <= value; i++) {
+      if (doubleI == value) {
         return true;
       }
     }
